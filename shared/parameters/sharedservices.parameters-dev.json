@@ -1,0 +1,257 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "locationList": {
+      "value": {
+        "westeurope": "weu",
+        "northeurope": "neu"
+      }
+    },
+    "env": {
+      "value": "dev"
+    },
+    "component": {
+      "value": "shared"
+    },
+    "product": {
+      "value": "bicep"
+    },
+    "resourceGroupProperties": {
+      "value": {
+        "roleAssignments": [
+          {
+            "roleDefinitionIdOrName": "Reader",
+            "description": "Reader Role Assignment",
+            "principalIds": ["ff9172ad-4041-4361-aa41-dda9a05ce369"]
+          }
+        ]
+      }
+    },
+    "actionGroupProperties": {
+      "value": {
+        "emailReceivers": [
+          {
+            "emailAddress": "salih.sert@linkit.nl",
+            "name": "salih_email",
+            "useCommonAlertSchema": false
+          }
+        ],
+        "armRoleReceivers": [
+          {
+            "name": "MonitoringReader",
+            "roleId": "43d0d8ad-25c7-4714-9337-8ba259a9fe05",
+            "useCommonAlertSchema": false
+          }
+        ],
+        "roleAssignments": [
+          {
+            "principalIds": ["ff9172ad-4041-4361-aa41-dda9a05ce369"],
+            "roleDefinitionIdOrName": "Reader"
+          }
+        ]
+      }
+    },
+    "applicationInsightProperties": {
+      "value": {
+        "roleAssignments": [
+          {
+            "principalIds": ["ff9172ad-4041-4361-aa41-dda9a05ce369"],
+            "roleDefinitionIdOrName": "Reader"
+          }
+        ],
+        "diagnostics": {
+          "logs": [
+            "AppAvailabilityResults",
+            "AppBrowserTimings",
+            "AppEvents",
+            "AppMetrics",
+            "AppDependencies",
+            "AppExceptions",
+            "AppPageViews",
+            "AppPerformanceCounters",
+            "AppRequests",
+            "AppSystemEvents",
+            "AppTraces"
+          ],
+          "metrics": ["AllMetrics"]
+        }
+      }
+    },
+    "workspaceProperties": {
+      "value": {
+        "retentionInDays": 30,
+        "skuName": "PerGB2018"
+      }
+    },
+    "vnetProperties": {
+      "value": {
+        "subnets": [
+          {
+            "name": "frontend",
+            "addressPrefix": "172.16.2.0/24",
+            "delegations": [
+              {
+                "name": "frontendDel",
+                "properties": {
+                  "serviceName": "Microsoft.Web/serverFarms"
+                }
+              }
+            ],
+            "privateEndpointNetworkPolicies": "Disabled",
+            "serviceEndpoints": [
+              {
+                "service": "Microsoft.KeyVault",
+                "locations": ["*"]
+              },
+              {
+                "service": "Microsoft.Web",
+                "locations": ["*"]
+              }
+            ]
+          },
+          {
+            "name": "middletier",
+            "addressPrefix": "172.16.3.0/24",
+            "delegations": [
+              {
+                "name": "frontendDel",
+                "properties": {
+                  "serviceName": "Microsoft.Web/serverFarms"
+                }
+              }
+            ],
+            "serviceEndpoints": [
+              {
+                "service": "Microsoft.KeyVault",
+                "locations": ["*"]
+              },
+              {
+                "service": "Microsoft.Web",
+                "locations": ["*"]
+              },
+              {
+                "service": "Microsoft.AzureCosmosDB",
+                "locations": ["*"]
+              }
+            ]
+          },
+          {
+            "name": "privateEndpoints",
+            "addressPrefix": "172.16.4.0/24",
+            "privateLinkServiceNetworkPolicies": "Enabled",
+            "privateEndpointNetworkPolicies": "Enabled"
+          }
+        ],
+        "addressPrefixes": ["172.16.0.0/20"],
+        "dnsServers": [],
+        "roleAssignments": [
+          {
+            "principalIds": ["ff9172ad-4041-4361-aa41-dda9a05ce369"],
+            "roleDefinitionIdOrName": "Reader"
+          }
+        ],
+        "diagnostics": {
+          "logs": ["VMProtectionAlerts"],
+          "metrics": ["AllMetrics"]
+        }
+      }
+    },
+    "keyVaultProperties": {
+      "value": {
+        "sku": "standard",
+        "enabledForDeployment": false,
+        "enabledForTemplateDeployment": true,
+        "enabledForDiskEncryption": false,
+        "enableRbacAuthorization": true,
+        "enableSoftDelete": true,
+        "softDeleteRetentionInDays": 90,
+        "enablePurgeProtection": true,
+        "enableNetworkAcls": true,
+        "allowedSubnets": ["frontend", "middletier"],
+        "diagnostics": {
+          "logs": ["AuditEvent", "AzurePolicyEvaluationDetails"],
+          "metrics": ["AllMetrics"]
+        },
+        "metricsRetentionDays": 30,
+        "roleAssignments": [
+          {
+            "principalIds": ["ff9172ad-4041-4361-aa41-dda9a05ce369"],
+            "roleDefinitionIdOrName": "Reader"
+          },
+          {
+            "principalIds": ["a92538bb-9cae-45e0-9b3b-7f2ba75db8b4"],
+            "roleDefinitionIdOrName": "Owner"
+          }
+        ]
+      }
+    },
+    "frontDoorProperties": {
+      "value": {
+        "enabledState": true,
+        "wafMode": "Prevention",
+        "wafEnabledState": true,
+        "endpoints": [
+          {
+            "name": "Default",
+            "hostName": "fd-bicep-dev.azurefd.net",
+            "enableSSL": false,
+            "sessionAffinityEnabledState": "Disabled",
+            "patternsToMatch": ["/*"],
+            "backendHosts": [
+              {
+                "poolName": "Default",
+                "address": "app-bicep-frontend-dev-ncenus-01.azurewebsites.net",
+                "hostHeader": "app-bicep-frontend-dev-necenus-01.azurewebsites.net",
+                "weight": 100
+              }
+            ]
+          },
+          {
+            "name": "bicep-dev",
+            "hostName": "bicep-dev.technicalpanda.com",
+            "enableSSL": true,
+            "sessionAffinityEnabledState": "Disabled",
+            "patternsToMatch": ["/*"],
+            "backendHosts": [
+              {
+                "poolName": "bicep-dev",
+                "address": "app-bicep-frontend-dev-ncenus-01.azurewebsites.net",
+                "hostHeader": "app-bicep-frontend-dev-ncenus-01.azurewebsites.net",
+                "weight": 100
+              }
+            ]
+          }
+        ],
+        "probes": [
+          {
+            "name": "Default",
+            "probePath": "/",
+            "probeMethod": "Head"
+          },
+          {
+            "name": "bicep-dev",
+            "probePath": "/",
+            "probeMethod": "Head"
+          }
+        ],
+        "lbSettings": [
+          {
+            "name": "Default",
+            "sampleSize": 4,
+            "successfulSamplesRequired": 2,
+            "backendPool": "Default",
+            "additionalLatencyMilliseconds": 0
+          },
+          {
+            "name": "bicep-dev",
+            "sampleSize": 4,
+            "successfulSamplesRequired": 2,
+            "backendPool": "bicep-dev",
+            "additionalLatencyMilliseconds": 0
+          }
+        ]
+      }
+    }
+  }
+}

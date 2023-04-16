@@ -1,0 +1,100 @@
+trigger:
+- "*"
+
+variables:
+  isMain: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')]
+  registryLoginSrv: sharedbicep.azurecr.io
+  serviceConnection: sharedbicep-rg
+  buildOnlychangedModules: 'true'
+
+jobs:
+  - job: Build
+    displayName: Build and publish Bicep Modules
+    pool:
+      vmImage: 'ubuntu-latest'
+
+    steps:
+    - task: AzureCLI@2
+      displayName: 'Get changed files'
+      inputs:
+        azureSubscription: $(serviceConnection)
+        scriptType: 'pscore'
+        scriptLocation: 'inlineScript'
+        failOnStandardError: true
+        inlineScript: |
+          Write-Host "BuildOnlyChangedModules: $(buildOnlychangedModules)"
+          $targetfolder = "$(Build.SourcesDirectory)" + "/shared/modules"
+          function CopyFiles{
+              param( [string]$source )
+
+              $target = $targetfolder + $source
+
+              New-Item -Force $target
+              copy-item $source $target -Force
+          }
+
+          If ("$(buildOnlychangedModules)" -eq 'true') {
+            $changes = git diff --name-only --relative --diff-filter AMR HEAD^ HEAD .
+          }
+          else {
+            $changes = Get-ChildItem $(Build.SourcesDirectory) -Filter "*.bicep" -Recurse
+          }
+          $changes
+          if ($changes -is [string]){ 
+            CopyFiles $changes 
+          }
+          else {
+              if ($changes -is [array])
+              {       
+                  foreach ($change in $changes)
+                  { 
+                    CopyFiles $change 
+                  }
+              }
+          }
+
+    - task: PowerShell@2
+      displayName: 'Set Bicep use binary from path'
+      inputs:
+        targetType: 'inline'
+        script: 'az bicep config set --name useBinaryFromPath --value true'
+        
+    - task: AzureCLI@2
+      displayName: 'Build Bicep Files'
+      inputs:
+        azureSubscription: $(serviceConnection)
+        scriptType: 'pscore'
+        scriptLocation: 'inlineScript'
+        failOnStandardError: true
+        inlineScript: |
+          az bicep install
+          az bicep version
+          tree -d -L 3 
+          tree -d -L 3 $(Build.StagingDirectory)
+          $targetfolder = "$(Build.StagingDirectory)" + "/shared/modules"
+          $bicepFiles = Get-ChildItem $targetfolder -Filter "*.bicep" -Recurse
+          Foreach ($file in $bicepFiles) {
+            write-host "Building: $($file.FullName)"
+            az bicep build --file $file.FullName
+          }
+
+    - task: AzureCLI@2
+      condition: and(succeeded(), eq(variables.isMain, 'true'))
+      displayName: 'Push Bicep Files to Registry'
+      inputs:
+        azureSubscription: $(serviceConnection)
+        scriptType: 'pscore'
+        scriptLocation: 'inlineScript'
+        failOnStandardError: true
+        inlineScript: |
+          az bicep install
+          az bicep version
+          $targetfolder = "$(Build.SourcesDirectory)" + "/shared/modules"
+          $bicepFiles = Get-ChildItem $targetfolder -Filter "*.bicep" -Recurse
+          Foreach ($file in $bicepFiles) {
+            $folderName = (($file.FullName -split '/')[-2]).tolower()
+            $fileName = (Split-Path -Path $file.FullName -LeafBase).tolower() 
+            $targetRepository = "/bicep/modules/$folderName/$fileName"
+            write-host "pushing: $fileName with Version: $(Build.BuildNumber)"
+            az bicep publish --file $file.FullName --target br:$(registryLoginSrv)$($targetRepository):$(Build.BuildNumber)
+          }

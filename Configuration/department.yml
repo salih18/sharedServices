@@ -1,0 +1,7 @@
+variables:
+  department: WEB
+  departmentLower: web
+  owner: 'Web Team'
+  defaultLocation: 'West Europe'
+  application: 'myapp'
+  tenantId: ce231c6c-437d-405c-a377-dc3f0f5d6098

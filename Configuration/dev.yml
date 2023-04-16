@@ -1,0 +1,36 @@
+variables:
+  environment: acc
+  environmentCaps: ACC
+  environmentLetter: a
+        
+  # ARM Connection
+  subscriptionId: xxxxxx-xxxx-xxxx-xxxx
+  armConnection: abot-dev-weu-sc
+
+  # Resource Groups
+  websiteResourceGroup: ps-web-rg-a
+  vnetResourceGroup: ps-web-vnet-rg-d
+  apiTestsResourceGroup: ps-web-apitests-rg-a
+
+  # WebApp Variables
+  webAppName: ${{ variables.environment }}-l-web
+  acr: sspscompanywebacc
+
+  vaultNameInfra: ss-ps-acc-kv-web-infra
+
+  # CMS Environment Variables
+  CMS-BaseUrl: https://graphql.mycms.com/content/v1/spaces
+  CMS-Environment: Acceptance
+  CMS-SpaceId: xxxxxxxxxx
+  CMS-OrgId: xxxxxxxxxxxxxxxx
+  
+  # Abc API URL
+  Abc-API-URL: https://api.company.com/aaaaaa/abcapp/2.0/
+
+  # Web App Authentication
+  cmsApp-ClientId: xxxxxxxxxxxx
+  companyCom-ClientId: xxxxxxxxxxxxx
+  companyCom-Pipeline-ClientId: xxxxxxxxxxxxxx
+
+  # Application Insight Name
+  appInsightName: ss-ps-acc-web-companycom
