@@ -1,4 +1,4 @@
-targetScope = 'subscription'
+targetScope = 'res'
 
 // ----------------------------------------
 // Parameter declaration
