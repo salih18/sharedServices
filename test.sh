@@ -32,3 +32,15 @@ az network application-gateway waf-policy managed-rule exclusion add \
 addExclusion "User-Agent"
 addExclusion "User"
 addExclusion "Test"
+
+
+selectors=(${selectors//,/ })
+
+# Loop over the selectors parameter and call addExclusion() for each selector
+for selector in "${selectors[@]}"
+do
+    echo "$selector"
+done
+
+
+
