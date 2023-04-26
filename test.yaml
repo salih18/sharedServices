@@ -1,0 +1,44 @@
+# Template for a stage
+parameters:
+  - name: stageName
+    type: string
+  - name: shouldRunTask1
+    type: boolean
+    default: true
+  - name: shouldRunTask2
+    type: boolean
+    default: true
+  - name: shouldRunTask3
+    type: boolean
+    default: true
+
+stages:
+- stage: ${{ parameters.stageName }}
+  jobs:
+  - template: job-template.yaml
+    parameters:
+      shouldRunTask1: ${{ parameters.shouldRunTask1 }}
+      shouldRunTask2: ${{ parameters.shouldRunTask2 }}
+      shouldRunTask3: ${{ parameters.shouldRunTask3 }}
+
+# Template for a job
+parameters:
+  - name: shouldRunTask1
+    type: boolean
+    default: true
+  - name: shouldRunTask2
+    type: boolean
+    default: true
+  - name: shouldRunTask3
+    type: boolean
+    default: true
+
+jobs:
+- job: BuildJob
+  steps:
+  - script: echo 'Running task 1...'
+    condition: eq('${{ parameters.shouldRunTask1 }}', 'true')
+  - script: echo 'Running task 2...'
+    condition: eq('${{ parameters.shouldRunTask2 }}', 'true')
+  - script: echo 'Running task 3...'
+    condition: eq('${{ parameters.shouldRunTask3 }}', 'true')
