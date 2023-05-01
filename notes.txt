@@ -1,1 +1,23 @@
       - ${{ if and(in(parameters.aa, 'web', 'web'), in(parameters.environment, 'acc', 'prd')) }}:
+      
+        jobs:
+          - job: job_${{ parameters.environment }}
+            displayName: Job (${{ parameters.environment }})
+
+            steps:
+
+              - task: PowerShell@2
+                inputs:
+                  targetType: 'inline'
+                  script: |
+                    $string = '${{ parameters.stage }}'
+                    $parts = $string.Split('_')
+
+                    $environment = $parts[2]
+                    $appPurpose = $parts[3]
+
+                    Write-Host "Environment: $environment"
+                    Write-Host "App Purpose: $appPurpose"
+
+              - script: |
+                    echo "Deploying Application Gateway for environment $(appgw_environment) and instance $(appgw_instance) "
