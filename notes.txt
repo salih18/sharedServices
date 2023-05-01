@@ -1,5 +1,7 @@
       - ${{ if and(in(parameters.aa, 'web', 'web'), in(parameters.environment, 'acc', 'prd')) }}:
 
+      name: $(Date:yyyyMMdd)$(Rev:.r)-${{ parameters.environment }}
+
 
               - task: PowerShell@2
                 inputs:
