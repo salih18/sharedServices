@@ -1,0 +1,97 @@
+parameters:
+- name: environment
+  type: string
+  values:
+    - Dev
+    - Acc
+    - Prd
+- name: dependsOn
+  type: object
+- name: stage
+  type: string
+- name: myParameterFromPipeline
+  type: string
+
+stages:
+
+
+
+# # Condition to run the stage if block only if the parameters.environment is a substring of parameters.stage
+#   - ${{ if contains(parameters['stage'], parameters['environment']) }}:
+      - stage: ${{ parameters.stage }}
+        displayName: Stage Name (${{ parameters.environment }}) ${{ parameters.myParameterFromPipeline }}
+        
+        variables:
+        - template: '../pipelines/global.yml'
+          parameters:
+            environment: ${{ parameters.environment }}
+        - group: uiVariableGroup      
+        - name: myParameterFromPipeline
+          ${{ if eq(parameters['environment'], 'acc') }}:
+            value: $(a)
+          ${{ if eq(parameters['environment'], 'dev') }}:
+            value: $(b)
+
+
+        pool:
+          name: Azure Pipelines
+          vmImage: 'windows-latest'
+        
+        jobs:
+          - job: job_${{ parameters.environment }}
+            displayName: Job (${{ parameters.environment }})
+            # variables:
+            # - template: '../pipelines/global.yml'
+            #   parameters:
+            #     environment: ${{ parameters.environment }}
+            steps:
+
+              - task: AzureCLI@2
+                displayName: Azure CLI
+                inputs:
+                  azureSubscription: ${{ variables.mySc }}
+                  # azureSubscription: $(serviceConnection)
+                  scriptType: ps
+                  scriptLocation: inlineScript
+                  inlineScript: |
+                    az --version
+                    az account show
+
+              # - task: PowerShell@2
+              #   name: 'PowerShellScript'
+              #   inputs:
+              #     targetType: 'inline'
+              #     script: |
+              #       $stage = '${{ parameters.stage }}'
+              #       $environment, $appPurpose = $stage.Split('_')[2..3]
+
+              #       Write-Host "Environment: $environment"
+              #       Write-Host "App Purpose: $appPurpose"
+              #       # write this varaibles for later usages
+              #       Write-Host "##vso[task.setvariable variable=environment;isOutput=true;]$environment"
+              #       Write-Host "##vso[task.setvariable variable=appPurpose;isOutput=true;]$appPurpose"
+              
+
+              # - script: |
+              #       echo "Deploying Application Gateway for environment $(PowerShellScript.environment) and instance $(PowerShellScript.appPurpose) "
+              # - powershell: |
+              #          Write-Host "The value of the pipeline variable is $(PowerShellScript.environment) instance3 $(PowerShellScript.appPurpose)"
+              - script: |
+                  echo "Echo from azurecli task uiVariable1 from UI haha $(uiVariable1)"            
+              - template: '../steps/step1.yml'
+                parameters:
+                  stepParameter: 'thisIsStep1Parameter'
+                  myParameterFromPipeline: '$(myParameterFromPipeline)'
+                  uiVariable: '$(uiVariable1)'
+                  # ifVariable: 'testifVariable'
+                  # uiVariable: ${{ variables.uiVariable1 }}
+
+          # - job: job_${{ parameters.environment }}_2
+          #   displayName: Job 2 (${{ parameters.environment }})
+          #   dependsOn: job_${{ parameters.environment }}
+          #   variables: 
+          #     environment: $[ dependencies.job_${{ parameters.environment }}.outputs['job_${{ parameters.environment }}.environment'] ]
+          #   steps:
+            
+          #     - script: |
+          #           echo "Deploying Application Gateway for environment $(environment) and instance $(appPurpose) "

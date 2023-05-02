@@ -1,0 +1,44 @@
+trigger: none
+
+parameters:
+  - name: myParameterFromPipeline
+    type: string
+  - name: stage
+    type: string
+    default: 'stage_1_dev'
+    values:
+    - 'stage_1_dev_primary'
+    - 'stage_1_acc_secondary'
+
+# variables:
+# - group: uiVariableGroup      
+
+stages:
+
+# - stage: stage1
+#   pool:
+#     name: Azure Pipelines
+#     vmImage: 'ubuntu-latest'
+#   jobs:
+#   - job: BuildJob
+#     steps:
+#     - script: echo 'Running task 1...'
+#       condition: eq('${{ parameters.shouldRunTask1 }}', 'true')
+#     - script: echo 'Running task 2...'
+#       condition: eq('${{ parameters.shouldRunTask2 }}', 'true')
+#     - script: echo 'Running task 3...'
+#       condition: eq('${{ parameters.shouldRunTask3 }}', 'true')
+
+- template: '../stages/stage1.yml'
+  parameters:
+    dependsOn: #nothing
+    environment: Dev
+    stage: ${{ parameters.stage }}_1
+    myParameterFromPipeline: ${{ parameters.myParameterFromPipeline }}
+
+- template: '../stages/stage1.yml'
+  parameters:
+    dependsOn: stage_1_dev
+    environment: Acc
+    stage: ${{ parameters.stage }}_2
+    myParameterFromPipeline: ${{ parameters.myParameterFromPipeline }}

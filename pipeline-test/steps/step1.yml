@@ -1,0 +1,82 @@
+parameters:
+  - name: stepParameter
+    type: string
+  - name: myParameterFromPipeline
+    type: string
+  - name: uiVariable
+    type: string
+  - name: ifVariable
+    type: string
+    default: ''
+    
+steps:
+
+# - task: AzureCLI@2
+#   displayName: 'App: Determine tag to deploy'
+#   inputs:
+#     azureSubscription: 'az-sc'
+#     ${{ if (parameters['ifVariable'], 'myIfVariable') }}:
+#       scriptType: pscore
+#     ${{ if eq(parameters['ifVariable'], 'myIfVariable') }}:
+#       scriptType: bash
+#     scriptLocation: inlineScript
+#     inlineScript: |
+#       which foobar &> /dev/null
+#       echo "Echo from step1 if_Variable  ${{ parameters.ifVariable }}" 
+
+
+# - task: AzureCLI@2
+#   inputs:
+#     azureSubscription: 'az-sc'
+#     scriptType: 'bash'
+#     scriptLocation: scriptPath
+#     scriptPath: '$(Build.SourcesDirectory)/scripts/myscript.sh'
+#     arguments:
+#       Test1
+#       Test2
+#   env:
+#    selectors: |
+#       User-Agent,
+#       User,
+#       Test,
+#       Another-Selector
+
+# - task: AzureCLI@2
+#   inputs:
+#     azureSubscription: 'az-sc'
+#     scriptType: 'bash'
+#     scriptLocation: 'inlineScript'
+#     inlineScript: |
+#       myVariable="$myVariable"
+#       echo "The value of myVariable is: $myVariable"
+#   env:
+#     myVariable: 'Hello, world!'
+
+# - task: AzurePowerShell@5
+#   inputs:
+#     azureSubscription: 'az-sc'
+#     scriptType: filePath
+#     scriptPath: '$(Build.SourcesDirectory)\scripts\myscript.ps1'
+#     scriptArguments:
+#       -Arg1 ${{ parameters.ifVariable }} `
+#       -Arg2 ${{ parameters.uiVariable }} `
+#       -Arg3 ${{ parameters.myParameterFromPipeline }}
+#     azurePowerShellVersion: latestVersion
+
+- script: |
+    echo "Echo from global variables team value is $(team)"  ##  Web Team
+    echo "Echo from global variables department value is $(department)" ## Web Dev
+
+    echo "Echo from uiVariable as variable $(uiVariable1)" ## myVariable1FromUI
+    echo "Echo from uiVariable as param ${{ parameters.uiVariable }}" ## myVariable1FromUI
+
+    echo "Echo from step1 stepParameter ${{ parameters.stepParameter }}" ## thisIsStep1Parameter
+
+    echo "Echo from step1 myParameterFromPipeline as param ${{ parameters.myParameterFromPipeline }}" ## BBBB
+    echo "Echo from step1 myParameterFromPipeline as variable expression from upper $(myParameterFromPipeline)" ## I-SET-IT
+
+    echo "Echo from step1 myParameterFromPipelineVariable as variable from upper ${{ variables.myParameterFromPipelineVariable }}" ## noooo
+    echo "Echo from step1 myParameterFromPipelineVariable as variable from upper $(myParameterFromPipelineVariable)" ## I-SET-IT
+
+    echo "Echo from step1 if_Variable  ${{ parameters.ifVariable }}" 
+

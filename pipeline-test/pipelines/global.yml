@@ -1,0 +1,15 @@
+variables:
+
+  team: 'Web Team'
+
+  ${{ if eq(parameters.environment, 'dev') }}:
+    department: 'Web Dev'
+    a: 'AAAA'
+    b: 'BBBB'
+    mySc: 'az-sc'
+
+  ${{ if eq(parameters.environment, 'acc') }}:
+    department: 'Web Acc'
+    a: 'AAAA'
+    b: 'BBBB'
+    mySc: 'az-sc'
