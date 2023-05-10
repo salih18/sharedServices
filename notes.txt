@@ -12,3 +12,11 @@
 
                     Write-Host "Environment: $environment"
                     Write-Host "App Purpose: $appPurpose"
+
+
+| Environment | Acronym | Azure Subscription | Resource Group |
+| ----------- | ------- | ----------------- | -------------- |
+| Development | Dev     | Subscription 1     | xx             |
+| Testing     | Test    | Subscription 1     | xx             |
+| Acceptance  | Acc     | Subscription 2     | acceptance-resource-group |
+| Production  | Prod    | Subscription 2     | production-resource-group |
