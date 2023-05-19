@@ -1,0 +1,18 @@
+# File: capitalize-template.yml
+
+parameters:
+- name: keyValuePairs
+  type: object
+  default: {}
+
+steps:
+- powershell: |
+    $keyValuePairs = ConvertFrom-Json -InputObject '${{ convertToJson(parameters.keyValuePairs) }}'
+    $modifiedKeyValuePairs = @{}
+    foreach ($key in $keyValuePairs.PSObject.Properties) {
+        $value = $key.Value
+        $newValue = ($value.Substring(0,1).ToUpper()+$value.Substring(1))
+        $modifiedKeyValuePairs[$key.Name] = $newValue
+        Write-Host "##vso[task.setvariable variable=$($key.Name)]$newValue"
+    }
+  displayName: 'Capitalize first letter of variable values'
