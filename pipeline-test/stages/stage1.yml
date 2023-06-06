@@ -80,7 +80,7 @@ stages:
                   echo "Echo from azurecli task uiVariable1 from UI haha $(uiVariable1)"            
               - template: '../steps/step1.yml'
                 parameters:
-                  stepParameter: 'thisIsStep1Parameter'
+                  stepParameter: 'allow'
                   myParameterFromPipeline: '$(myParameterFromPipeline)'
                   uiVariable: '$(uiVariable1)'
                   # ifVariable: 'testifVariable'

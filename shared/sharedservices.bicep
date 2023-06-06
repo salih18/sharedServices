@@ -24,6 +24,7 @@ param product string
 param resourceGroupProperties object
 
 @description('Properties for deploying action group')
+
 param actionGroupProperties object
 
 @description('Properties of Logs Workspace deployment')

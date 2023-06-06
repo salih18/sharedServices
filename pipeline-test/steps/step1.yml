@@ -8,8 +8,16 @@ parameters:
   - name: ifVariable
     type: string
     default: ''
+  - name: testVariable
+    type: string
     
 steps:
+
+
+- ${{ if eq(parameters.stepParameter, 'allow') }}:
+  - script: echo ${{ parameters.testVariable }}
+    displayName: 'Echo from step1 testVariable'
+
 
 # - task: AzureCLI@2
 #   displayName: 'App: Determine tag to deploy'
