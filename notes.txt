@@ -20,3 +20,24 @@
 | Testing     | Test    | Subscription 1     | xx             |
 | Acceptance  | Acc     | Subscription 2     | acceptance-resource-group |
 | Production  | Prod    | Subscription 2     | production-resource-group |
+
+
+
+Title: Automated Application Gateway Certification Refresh and Notification Process
+
+Description:
+Currently, the creation of application gateway certifications in the development and testing environments requires manual intervention and lacks an automated process for monitoring expiration dates. This refinement task aims to improve the certification creation process by implementing an automated solution that addresses the following issues:
+
+Expiration Date Monitoring: Develop a script that regularly checks the expiration dates of application gateway certifications in the development and testing environments. If a certification is nearing expiration, the script will notify the team, ensuring proactive action can be taken.
+
+Certification Refresh: Upon approval, enhance the existing pipeline to automatically refresh the expiring certifications with new ones in the development and testing environments. The pipeline should initiate the necessary steps to obtain and apply the new certifications seamlessly.
+
+Email Notification: After the certification refresh process is completed, send an email notification to the team, informing them that the new certifications have been successfully deployed. This communication ensures transparency and allows team members to update their configurations accordingly.
+
+Additionally, the refinement task extends to the acceptance (acc) and production (prod) stages, as these stages currently involve complex manual processes, increasing the risk of deploying broken certifications to the key vault. The goal is to streamline and automate the certification creation process in the acc and prod stages, addressing the following objectives:
+
+Process Simplification: Simplify the existing complex manual workflow involved in acc and prod certification creation. Identify and eliminate unnecessary manual steps, reducing the potential for errors and misconfigurations.
+
+Automation: Develop an automated solution for creating and deploying certifications in the acc and prod stages. This solution should leverage infrastructure-as-code principles and Azure DevOps capabilities to streamline the process and ensure consistent and reliable certificate deployments.
+
+By implementing these refinements, we aim to enhance the efficiency, reliability, and security of the application gateway certification creation process across all environments, while minimizing manual intervention and reducing the risk of deploying broken certifications.
