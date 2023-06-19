@@ -62,3 +62,26 @@ done
         }
       }
     azurePowerShellVersion: 'LatestVersion'
+
+
+    - task: AzureCLI@2
+  inputs:
+    azureSubscription: '<Your-Azure-Service-Connection>'
+    scriptType: 'pscore'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      $vnetName = "your_vnet_name"
+      $resourceGroup = "your_resource_group"
+      $subnets = @("subnet1", "subnet2")
+
+      foreach($subnet in $subnets) {
+        $subnetDetails = az network vnet subnet show --resource-group $resourceGroup --vnet-name $vnetName --name $subnet -o json | ConvertFrom-Json
+        $keyVaultEndpoint = $subnetDetails.serviceEndpoints | Where-Object { $_.service -eq 'Microsoft.KeyVault' }
+        
+        if ($null -ne $keyVaultEndpoint -and $keyVaultEndpoint.provisioningState -eq 'Succeeded') {
+            Write-Output "Key Vault service endpoints in subnet $subnet are enabled."
+        } else {
+            Write-Error "Key Vault service endpoints in subnet $subnet are not enabled."
+            exit 1
+        }
+      }
