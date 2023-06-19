@@ -44,3 +44,21 @@ done
 
 
 
+- task: AzurePowerShell@5
+  inputs:
+    azureSubscription: '<Your-Azure-Service-Connection>'
+    ScriptType: 'InlineScript'
+    Inline: |
+      $vnetName = "your_vnet_name"
+      $resourceGroup = "your_resource_group"
+      $subnets = @("subnet1", "subnet2")
+
+      foreach($subnet in $subnets) {
+        $serviceEndpoints = az network vnet subnet show --resource-group $resourceGroup --vnet-name $vnetName --name $subnet --query 'serviceEndpoints[].provisioningState' -o tsv
+        if ($serviceEndpoints -contains "Succeeded") {
+            Write-Output "Service endpoints in subnet $subnet are enabled."
+        } else {
+            Write-Output "Service endpoints in subnet $subnet are not enabled."
+        }
+      }
+    azurePowerShellVersion: 'LatestVersion'
